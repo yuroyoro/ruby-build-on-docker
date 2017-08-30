@@ -11,6 +11,10 @@ docker_run_in_build() {
     docker run --rm -it -v $(pwd):/workdir -w /workdir/build $image $*
 }
 
+run_make() {
+    docker_run_in_build make $*
+}
+
 cmd=$1
 shift
 case "$cmd" in
@@ -24,8 +28,10 @@ case "$cmd" in
         docker_run_in_build ../ruby/configure --prefix=/workdir/install --enable-shared
         ;;
     make)
-        docker_run_in_build make -j &&
-        docker_run_in_build make install
+        run_make $*
+        ;;
+    build)
+        run_make -j && run_make install-nodoc
         ;;
     clean)
         docker_run_in_build make clean
@@ -34,7 +40,10 @@ case "$cmd" in
         docker_run bash
         ;;
     ruby)
-        docker_run ./install/bin/ruby $*
+        docker_run ./build/ruby $*
+        ;;
+    miniruby)
+        docker_run ./build/miniruby $*
         ;;
     irb)
         docker_run ./install/bin/irb $*
@@ -45,9 +54,11 @@ Usage: $0 command
 
   init      Setup build image and check out ruby source
   configure configure
-  make      make -j && make clean
+  make      run make command in docker
+  build     make -j && make clean
   clean     make clean
   ruby      run compiled ruby
+  miniruby  run compiled ruby
   irb       launch irb
 EOF
         echo "$help"
