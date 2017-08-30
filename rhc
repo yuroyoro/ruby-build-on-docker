@@ -60,7 +60,7 @@ case "$cmd" in
         run_make run
         ;;
     irb)
-        docker_run ./install/bin/irb $*
+        docker_run ./build/ruby ./ruby/bin/irb $*
         ;;
     *)
         read -d '' help <<-EOF
