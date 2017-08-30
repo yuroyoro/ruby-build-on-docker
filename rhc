@@ -2,13 +2,24 @@
 
 image="yuroyoro/ruby-build:1.0.0"
 
+init() {
+    repo="https://github.com/ruby/ruby.git"
+    if [ -e "$1" ] ; then
+        repo="$1"
+    fi
+
+    git clone $repo &&
+    mkdir -p build &&
+    mkdir -p install &&
+    docker build --no-cache --tag=yuroyoro/ruby-build:1.0.0 .
+}
 docker_run() {
-    echo "docker run --rm -it -v $(pwd):/workdir $image $*"
-    docker run --rm -it -v $(pwd):/workdir $image $*
+    # echo "docker run --rm -it -v $(pwd):/workdir $image $*"
+    docker run --rm -it --privileged -v $(pwd):/workdir $image $*
 }
 
 docker_run_in_build() {
-    docker run --rm -it -v $(pwd):/workdir -w /workdir/build $image $*
+    docker run --rm -it --privileged -v $(pwd):/workdir -w /workdir/build $image $*
 }
 
 run_make() {
