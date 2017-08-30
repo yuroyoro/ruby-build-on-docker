@@ -1,0 +1,56 @@
+#!/bin/bash
+
+image="yuroyoro/ruby-build:1.0.0"
+
+docker_run() {
+    echo "docker run --rm -it -v $(pwd):/workdir $image $*"
+    docker run --rm -it -v $(pwd):/workdir $image $*
+}
+
+docker_run_in_build() {
+    docker run --rm -it -v $(pwd):/workdir -w /workdir/build $image $*
+}
+
+cmd=$1
+shift
+case "$cmd" in
+    init)
+        git clone https://github.com/ruby/ruby.git &&
+        mkdir -p build &&
+        mkdir -p install &&
+        docker build --no-cache --tag=yuroyoro/ruby-build:1.0.0 .
+        ;;
+    configure)
+        docker_run_in_build ../ruby/configure --prefix=/workdir/install --enable-shared
+        ;;
+    make)
+        docker_run_in_build make -j &&
+        docker_run_in_build make install
+        ;;
+    clean)
+        docker_run_in_build make clean
+        ;;
+    bash)
+        docker_run bash
+        ;;
+    ruby)
+        docker_run ./install/bin/ruby $*
+        ;;
+    irb)
+        docker_run ./install/bin/irb $*
+        ;;
+    *)
+        read -d '' help <<-EOF
+Usage: $0 command
+
+  init      Setup build image and check out ruby source
+  configure configure
+  make      make -j && make clean
+  clean     make clean
+  ruby      run compiled ruby
+  irb       launch irb
+EOF
+        echo "$help"
+        exit 2
+        ;;
+esac
