@@ -45,6 +45,9 @@ case "$cmd" in
     miniruby)
         docker_run ./build/miniruby $*
         ;;
+    run)
+        run_make run
+        ;;
     irb)
         docker_run ./install/bin/irb $*
         ;;
@@ -58,7 +61,8 @@ Usage: $0 command
   build     make -j && make clean
   clean     make clean
   ruby      run compiled ruby
-  miniruby  run compiled ruby
+  miniruby  run compiled miniruby
+  run       run ruby/test.rb
   irb       launch irb
 EOF
         echo "$help"

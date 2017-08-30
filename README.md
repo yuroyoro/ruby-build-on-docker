@@ -16,6 +16,8 @@ Usage: rhc command
   build     make -j && make clean
   clean     make clean
   ruby      run compiled ruby
+  miniruby  run compiled miniruby
+  run       run ruby/test.rb
   irb       launch irb
 ```
 
